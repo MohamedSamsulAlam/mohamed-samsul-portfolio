@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="M">
+  <defs>
+    <linearGradient id="mGrad" x1="8" y1="8" x2="56" y2="56" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#13dfff"/>
+      <stop offset="52%" stop-color="#138dff"/>
+      <stop offset="100%" stop-color="#9d35ff"/>
+    </linearGradient>
+    <linearGradient id="bgGrad" x1="0" y1="0" x2="64" y2="64" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#0a1935"/>
+      <stop offset="100%" stop-color="#030813"/>
+    </linearGradient>
+    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="1.2" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  <rect width="64" height="64" rx="14" fill="url(#bgGrad)"/>
+  <rect x="1" y="1" width="62" height="62" rx="13" fill="none" stroke="rgba(19,223,255,0.35)" stroke-width="1"/>
+  <text
+    x="32"
+    y="44"
+    text-anchor="middle"
+    font-family="Inter,Segoe UI,Arial,sans-serif"
+    font-size="38"
+    font-weight="800"
+    fill="url(#mGrad)"
+    filter="url(#glow)"
+  >M</text>
+</svg>
