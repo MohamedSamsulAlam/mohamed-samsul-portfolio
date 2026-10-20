@@ -347,3 +347,24 @@ html[data-theme="light"] .modal-dialog{border-color:var(--border)}
   .about-card{padding:16px}
 
 }
+
+.resume-page{width:min(100%,1340px);margin:0 auto;padding:30px clamp(16px,3vw,40px) 32px}
+.resume-page-heading{display:flex;align-items:flex-end;justify-content:space-between;gap:24px;margin-bottom:20px}
+.resume-page-eyebrow{margin:0 0 7px;color:var(--cyan);font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase}
+.resume-page-heading h1{margin:0;color:var(--heading);font-size:clamp(28px,4vw,42px);letter-spacing:-.04em}
+.resume-page-heading p:not(.resume-page-eyebrow){margin:8px 0 0;color:var(--text-secondary);font-size:13px;line-height:1.6}
+.resume-page-actions{display:flex;flex-wrap:wrap;gap:10px}
+.resume-viewer{overflow:hidden;border:1px solid var(--panel-border);border-radius:14px;background:#fff;box-shadow:var(--panel-shadow)}
+.resume-pdf-frame{display:block;width:100%;height:min(78vh,1000px);min-height:560px;border:0;background:#fff}
+
+@media(max-width:850px){
+  .resume-page{padding-top:24px}
+  .resume-page-heading{align-items:flex-start;flex-direction:column;gap:16px}
+  .resume-pdf-frame{height:72vh;min-height:520px}
+}
+
+@media(max-width:420px){
+  .resume-page-actions{width:100%;flex-direction:column}
+  .resume-page-actions .btn{width:100%}
+  .resume-pdf-frame{height:68vh;min-height:480px}
+}

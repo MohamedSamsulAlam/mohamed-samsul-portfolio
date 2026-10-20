@@ -1,6 +1,6 @@
 import React from 'react';
 import {
-  House, UserRound, Sparkles, FolderKanban, FileText, Mail, MapPin,
+  House, UserRound, Sparkles, FolderKanban, FileText, Mail, MapPin, ArrowLeft,
   Phone, Github, Linkedin, Download, ArrowUpRight, GraduationCap,
   BriefcaseBusiness, Code2, ExternalLink, Menu, X, Sun, Moon
 } from 'lucide-react';
@@ -64,7 +64,7 @@ const navItems = [
   { label: 'About', href: '#about', icon: UserRound },
   { label: 'Skills', href: '#skills', icon: Sparkles },
   { label: 'Projects', href: '#projects', icon: FolderKanban },
-  { label: 'Resume', href: '#resume', icon: FileText },
+  { label: 'Resume', href: '/resume', icon: FileText },
   { label: 'Contact', href: '#contact', icon: Mail },
 ];
 
@@ -93,7 +93,10 @@ function SectionTitle({ icon: Icon, children, accent = '' }) {
 export default function App() {
   const [menuOpen, setMenuOpen] = React.useState(false);
   const [theme, setTheme] = React.useState(getInitialTheme);
-  const [activeSection, setActiveSection] = React.useState('home');
+  const [showResume, setShowResume] = React.useState(() => window.location.pathname.replace(/\/+$/, '') === '/resume');
+  const [activeSection, setActiveSection] = React.useState(() => (
+    window.location.pathname.replace(/\/+$/, '') === '/resume' ? 'resume' : 'home'
+  ));
   const [selectedProject, setSelectedProject] = React.useState(null);
   const modalCloseRef = React.useRef(null);
 
@@ -112,7 +115,9 @@ export default function App() {
   }, [menuOpen]);
 
   React.useEffect(() => {
-    const sectionIds = navItems.map(({ href }) => href.slice(1));
+    if (showResume) return undefined;
+
+    const sectionIds = navItems.filter(({ href }) => href.startsWith('#')).map(({ href }) => href.slice(1));
     const observer = new IntersectionObserver(
       (entries) => {
         const visible = entries
@@ -131,6 +136,24 @@ export default function App() {
     });
 
     return () => observer.disconnect();
+  }, [showResume]);
+
+  React.useEffect(() => {
+    const onPopState = () => {
+      const resumeRoute = window.location.pathname.replace(/\/+$/, '') === '/resume';
+      setShowResume(resumeRoute);
+      setActiveSection(resumeRoute ? 'resume' : 'home');
+      setMenuOpen(false);
+      if (!resumeRoute && window.location.hash) {
+        const id = window.location.hash.slice(1);
+        window.requestAnimationFrame(() => {
+          document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        });
+      }
+    };
+
+    window.addEventListener('popstate', onPopState);
+    return () => window.removeEventListener('popstate', onPopState);
   }, []);
 
   React.useEffect(() => {
@@ -165,11 +188,38 @@ export default function App() {
   const scrollToSection = (event, href) => {
     event.preventDefault();
     const id = href.replace('#', '');
+    if (showResume) {
+      window.history.pushState({}, '', `/${href}`);
+      setShowResume(false);
+      setActiveSection(id);
+      setMenuOpen(false);
+      window.requestAnimationFrame(() => {
+        document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      });
+      return;
+    }
     const target = document.getElementById(id);
     if (target) {
       target.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
     setMenuOpen(false);
+  };
+
+  const openResume = (event) => {
+    event.preventDefault();
+    window.history.pushState({}, '', '/resume');
+    setShowResume(true);
+    setActiveSection('resume');
+    setMenuOpen(false);
+    window.scrollTo({ top: 0 });
+  };
+
+  const returnHome = (event) => {
+    event.preventDefault();
+    window.history.pushState({}, '', '/');
+    setShowResume(false);
+    setActiveSection('home');
+    window.setTimeout(() => window.scrollTo({ top: 0, behavior: 'smooth' }), 0);
   };
 
   const toggleTheme = () => {
@@ -200,10 +250,10 @@ export default function App() {
         <nav>
           {navItems.map(({ label, href, icon: Icon }) => (
             <a
-              className={activeSection === href.slice(1) ? 'nav-link active' : 'nav-link'}
+              className={(href === '/resume' ? showResume : !showResume && activeSection === href.slice(1)) ? 'nav-link active' : 'nav-link'}
               key={label}
               href={href}
-              onClick={(event) => scrollToSection(event, href)}
+              onClick={href === '/resume' ? openResume : (event) => scrollToSection(event, href)}
             >
               <Icon size={17} /><span>{label}</span>
             </a>
@@ -239,6 +289,33 @@ export default function App() {
           </button>
         </div>
 
+        {showResume ? (
+          <section className="resume-page" aria-labelledby="resume-page-title">
+            <div className="resume-page-heading">
+              <div>
+                <p className="resume-page-eyebrow">Professional profile</p>
+                <h1 id="resume-page-title">My Resume</h1>
+                <p>View my experience, education, skills, and projects in the document below.</p>
+              </div>
+              <div className="resume-page-actions">
+                <a className="btn btn-primary" href="/resume.pdf" download="Mohamed_Samsul_Alam_K_Resume.pdf">
+                  <Download size={16} /> Download Resume
+                </a>
+                <a className="btn btn-outline" href="/" onClick={returnHome}>
+                  <ArrowLeft size={16} /> Back to Home
+                </a>
+              </div>
+            </div>
+            <div className="resume-viewer">
+              <iframe
+                src="/resume.pdf"
+                title="Mohamed Samsul Alam K resume"
+                className="resume-pdf-frame"
+              />
+            </div>
+          </section>
+        ) : (
+          <>
         <section className="hero" id="home">
           <div className="hero-copy">
             <p className="eyebrow">Hi, I&apos;m</p>
@@ -360,6 +437,9 @@ export default function App() {
               <div className="resume-content">
                 <SectionTitle icon={FileText}>My <b>Resume</b></SectionTitle>
                 <p>Check out my detailed resume with skills, education, experience, and projects.</p>
+                <a className="btn btn-small btn-outline" href="/resume" onClick={openResume}>
+                  View Resume <ArrowUpRight size={14}/>
+                </a>
                 <a className="btn btn-small btn-outline" href="/resume.pdf" download="Mohamed_Samsul_Alam_K_Resume.pdf">
                   Download Resume <Download size={14}/>
                 </a>
@@ -377,6 +457,8 @@ export default function App() {
           </div>
         </section>
         <footer><span></span><p>Thanks for visiting my portfolio <b>♥</b></p><span></span></footer>
+          </>
+        )}
       </main>
 
       {selectedProject && (
